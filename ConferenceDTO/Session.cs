@@ -16,7 +16,5 @@ namespace ConferenceDTO
         //Обчислення тривалості конференції із використанням null-coalescence оператора
         public TimeSpan Duration =>
             EndTime?.Subtract(StartTime ?? EndTime ?? DateTimeOffset.MinValue) ?? TimeSpan.Zero;
-
-
     }
 }

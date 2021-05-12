@@ -33,7 +33,8 @@ namespace BackEnd
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo {Title = "Conference Planner API", Version = "v1"});
-
+                options.DescribeAllEnumsAsStrings();
+                
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 options.IncludeXmlComments(xmlPath);

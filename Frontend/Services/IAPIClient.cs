@@ -14,5 +14,6 @@ namespace Frontend.Services
         Task PutSessionAsync(Session session);
         Task<bool> AddAttendeeAsync(string name);
         Task DeleteSessionAsync(int id);
+        Task<List<SearchResult>> SearchAsync(string query);
     }
 }

@@ -130,34 +130,5 @@ namespace BackEnd.Controllers
 
             return session.MapSessionResponse();
         }
-
-
-        [HttpPost("upload")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Upload([FromForm] ConferenceFormat format, IFormFile file)
-        {
-            var loader = GetLoader(format);
-
-            using (var stream = file.OpenReadStream())
-                await loader.LoadDataAsync(stream, _context);
-
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        private static DataLoader GetLoader(ConferenceFormat format)
-        {
-            if (format == ConferenceFormat.Sessionize)
-                return new SessionizeLoader();
-
-            return new DevIntersectionLoader();
-        }
-
-        public enum ConferenceFormat
-        {
-            Sessionize,
-            DevIntersections
-        }
     }
 }

@@ -2,13 +2,11 @@
 
 namespace BackEnd.Data
 {
+    /// <summary>
+    /// Здійснює маппінг DTO
+    /// </summary>
     public static class EntityExtensions
     {
-        /// <summary>
-        /// Маппінг моделі доповідача із переліком сесій
-        /// </summary>
-        /// <param name="speaker"></param>
-        /// <returns></returns>
         public static ConferenceDTO.SpeakerResponse MapSpeakerResponse(this Speaker speaker) =>
             new ConferenceDTO.SpeakerResponse
             {

@@ -12,7 +12,7 @@ namespace BackEnd.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //Забезпечити унікальність ім'я учасника
+            //Забезпечити унікальність імені учасника
             modelBuilder.Entity<Attendee>()
                 .HasIndex(a => a.UserName)
                 .IsUnique();

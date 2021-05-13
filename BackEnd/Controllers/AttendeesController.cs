@@ -2,14 +2,16 @@
 using System.Threading.Tasks;
 using BackEnd.Data;
 using ConferenceDTO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Attendee = BackEnd.Data.Attendee;
+using Attendee = ConferenceDTO.Attendee;
 using Session = BackEnd.Data.Session;
 
 namespace BackEnd.Controllers
 {
+    /// <summary>
+    /// CRUD операції із учасниками
+    /// </summary>
     [Route("/api/[controller]")]
     [ApiController]
     public class AttendeesController : ControllerBase
@@ -20,12 +22,17 @@ namespace BackEnd.Controllers
         {
             _context = context;
         }
-
+        
+        /// <summary>
+        /// Повертає дані учасника і доповіді, на які він зареєструвався
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         [HttpGet("{username}")]
         public async Task<ActionResult<AttendeeResponse>> Get(string username)
         {
             var attendee = await _context.Attendees.Include(a => a.SessionAttendees)
-                .ThenInclude<Attendee, SessionAttendee, Session>(sa => sa.Session)
+                .ThenInclude<Data.Attendee, SessionAttendee, Session>(sa => sa.Session)
                 .SingleOrDefaultAsync(a => a.UserName == username);
 
             if (attendee == null)
@@ -35,23 +42,24 @@ namespace BackEnd.Controllers
 
             return result;
         }
-
+        
+        /// <summary>
+        /// Додати нового учасника
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<AttendeeResponse>> Post(ConferenceDTO.Attendee input)
+        public async Task<ActionResult<AttendeeResponse>> Post(Attendee input)
         {
-            // Check if the attendee already exists
+            // Перевірка чи вже було додано такого учасника 
             var existingAttendee = await _context.Attendees
                 .Where(a => a.UserName == input.UserName)
                 .FirstOrDefaultAsync();
 
             if (existingAttendee != null)
-            {
                 return Conflict(input);
-            }
 
-            var attendee = new Attendee
+            var attendee = new Data.Attendee
             {
                 FirstName = input.FirstName,
                 LastName = input.LastName,
@@ -67,15 +75,17 @@ namespace BackEnd.Controllers
             return CreatedAtAction(nameof(Get), new {username = result.UserName}, result);
         }
 
+        /// <summary>
+        /// Додати слухача доповіді
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
         [HttpPost("{username}/session/{sessionId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesDefaultResponseType]
-        public async Task<ActionResult<AttendeeResponse>> AddSession(string username, int sessionId)
+        public async Task<ActionResult<AttendeeResponse>> AddToSession(string username, int sessionId)
         {
             var attendee = await _context.Attendees.Include(a => a.SessionAttendees)
-                .ThenInclude<Attendee, SessionAttendee, Session>(sa => sa.Session)
+                .ThenInclude<Data.Attendee, SessionAttendee, Session>(sa => sa.Session)
                 .SingleOrDefaultAsync(a => a.UserName == username);
 
             if (attendee == null)
@@ -99,12 +109,14 @@ namespace BackEnd.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Видалити слухача доповіді
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
         [HttpDelete("{username}/session/{sessionId}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesDefaultResponseType]
-        public async Task<IActionResult> RemoveSession(string username, int sessionId)
+        public async Task<IActionResult> RemoveFromSession(string username, int sessionId)
         {
             var attendee = await _context.Attendees.Include(a => a.SessionAttendees)
                 .SingleOrDefaultAsync(a => a.UserName == username);

@@ -12,14 +12,15 @@ namespace Frontend.Pages
     {
         private readonly IAPIClient _apiClient;
 
-        public SessionModel(IAPIClient apiClient)
-        {
-            _apiClient = apiClient;
-        }
 
         public SessionResponse Session { get; set; }
 
         public int? DayOffset { get; set; }
+        
+        public SessionModel(IAPIClient apiClient)
+        {
+            _apiClient = apiClient;
+        }
         
         public async Task<IActionResult> OnGetAsync(int id)
         {
